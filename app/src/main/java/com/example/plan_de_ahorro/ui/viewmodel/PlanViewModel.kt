@@ -18,9 +18,12 @@ class PlanViewModel(private val repository: PlanRepository) : ViewModel() {
     private val _selectedPlan = MutableStateFlow<Plan?>(null)
     val selectedPlan: StateFlow<Plan?> = _selectedPlan
 
-    fun createPlan(name: String) {
+    private val _members = MutableStateFlow<List<Member>>(emptyList())
+    val members: StateFlow<List<Member>> = _members
+
+    fun createPlan(name: String, motive: String, targetAmount: Double, months: Int) {
         viewModelScope.launch {
-            val newPlan = Plan(name = name)
+            val newPlan = Plan(name = name, motive = motive, targetAmount = targetAmount, months = months)
             repository.createPlan(newPlan)
             loadPlans()
         }
@@ -35,14 +38,15 @@ class PlanViewModel(private val repository: PlanRepository) : ViewModel() {
     fun loadPlanDetails(planId: String) {
         viewModelScope.launch {
             _selectedPlan.value = repository.getPlanById(planId)
+            _members.value = repository.getMembersByPlanId(planId)
         }
     }
 
-    fun createMember(name: String, planId: String) {
+    fun createMember(name: String, planId: String, contributionPerMonth: Double) {
         viewModelScope.launch {
-            val newMember = Member(name = name, planId = planId)
+            val newMember = Member(name = name, planId = planId, contributionPerMonth = contributionPerMonth)
             repository.createMember(newMember)
-            loadPlanDetails(planId)
+            loadPlanDetails(planId) // Refresh plan details to show the new member
         }
     }
 
@@ -50,7 +54,7 @@ class PlanViewModel(private val repository: PlanRepository) : ViewModel() {
         viewModelScope.launch {
             val newPayment = Payment(amount = amount, memberId = memberId, planId = planId)
             repository.createPayment(newPayment)
-            loadPlanDetails(planId)
+            loadPlanDetails(planId) // Refresh plan details
         }
     }
 }

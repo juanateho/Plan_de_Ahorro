@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.plan_de_ahorro.ui.screens.PlanScreen
+import com.example.plan_de_ahorro.navigation.AppNavigation
 import com.example.plan_de_ahorro.ui.theme.Plan_de_AhorroTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    PlanScreen()
+                    AppNavigation()
                 }
             }
         }
