@@ -1,6 +1,8 @@
 package com.example.plan_de_ahorro.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -21,7 +23,19 @@ fun AddMemberScreen(
     var contribution by remember { mutableStateOf("") }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Añadir Miembro") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("Añadir Miembro") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver"
+                        )
+                    }
+                }
+            )
+        }
     ) {
         paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).padding(16.dp)) {
