@@ -40,7 +40,7 @@ fun AddMemberScreen(
         paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).padding(16.dp)) {
             OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Nombre del Miembro") }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = contribution, onValueChange = { contribution = it }, label = { Text("Aporte Mensual") }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(value = contribution, onValueChange = { contribution = it }, label = { Text("Aporte Minimo Mensual") }, modifier = Modifier.fillMaxWidth())
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
                 viewModel.createMember(name, planId, contribution.toDouble())

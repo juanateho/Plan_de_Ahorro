@@ -11,6 +11,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
+data class MemberStat(
+    val member: Member,
+    val totalPaid: Double,
+    val paymentsCount: Int
+)
+
 class PlanViewModel(private val repository: PlanRepository) : ViewModel() {
 
     private val _plans = MutableStateFlow<List<Plan>>(emptyList())
@@ -33,6 +39,18 @@ class PlanViewModel(private val repository: PlanRepository) : ViewModel() {
             val totalPaid = payments.sumOf { it.amount }
             val remaining = plan.targetAmount - totalPaid
             if (remaining < 0) 0.0 else remaining
+        }
+    }
+    
+    // Calculated state for Member Stats table to keep logic out of UI
+    val memberStats = combine(_members, _payments) { members, payments ->
+        members.map { member ->
+            val memberPayments = payments.filter { it.memberId == member.id }
+            MemberStat(
+                member = member,
+                totalPaid = memberPayments.sumOf { it.amount },
+                paymentsCount = memberPayments.size
+            )
         }
     }
 

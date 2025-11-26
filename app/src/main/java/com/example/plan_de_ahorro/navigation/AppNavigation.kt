@@ -9,6 +9,7 @@ import com.example.plan_de_ahorro.ui.screens.AddPaymentScreen
 import com.example.plan_de_ahorro.ui.screens.CreatePlanScreen
 import com.example.plan_de_ahorro.ui.screens.PlanDetailScreen
 import com.example.plan_de_ahorro.ui.screens.PlanListScreen
+import com.example.plan_de_ahorro.ui.screens.PlanStatsScreen
 
 @Composable
 fun AppNavigation() {
@@ -36,6 +37,12 @@ fun AppNavigation() {
             val planId = backStackEntry.arguments?.getString("planId")
             planId?.let {
                 AddPaymentScreen(navController = navController, planId = it)
+            }
+        }
+        composable("planStats/{planId}") { backStackEntry ->
+            val planId = backStackEntry.arguments?.getString("planId")
+            planId?.let {
+                PlanStatsScreen(navController = navController, planId = it)
             }
         }
     }

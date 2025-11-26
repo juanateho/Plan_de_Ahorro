@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -74,23 +75,16 @@ fun PlanDetailScreen(
 
                 Text("Miembros", style = MaterialTheme.typography.titleMedium)
                 
-                // We will use a LazyColumn for the whole content that scrolls
-                // But wait, we have "Members" AND "History". 
-                // Let's structure it so we don't have nested LazyColumns.
-                
                 val filteredPayments = if (selectedMonth == null) {
                     payments
                 } else {
                     payments.filter { 
                         try {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && it.date != null) {
-                                // Assuming date format is ISO (YYYY-MM-DD) or similar that LocalDate parses
-                                // If the format is different, adjust the formatter.
-                                // Let's try basic ISO parsing first.
                                 val date = LocalDate.parse(it.date.substring(0, 10))
                                 date.monthValue == selectedMonth
                             } else {
-                                true // If no date or old android, just show it (or filter out? show is safer)
+                                true 
                             }
                         } catch (e: Exception) {
                            true 
@@ -106,7 +100,7 @@ fun PlanDetailScreen(
                         ) {
                             Column(modifier = Modifier.padding(12.dp)) {
                                 Text(member.name, style = MaterialTheme.typography.bodyLarge)
-                                Text("Aporte mensual: $${member.contributionPerMonth}", style = MaterialTheme.typography.bodySmall)
+                                Text("Aporte minimo mensual: $${member.contributionPerMonth}", style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
@@ -120,30 +114,40 @@ fun PlanDetailScreen(
                         ) {
                             Text("Historial de Pagos", style = MaterialTheme.typography.titleMedium)
                             
-                            // Filter Dropdown
-                            var expanded by remember { mutableStateOf(false) }
-                            Box {
-                                IconButton(onClick = { expanded = true }) {
-                                    Icon(Icons.Default.DateRange, contentDescription = "Filtrar por mes")
-                                }
-                                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                                    DropdownMenuItem(
-                                        text = { Text("Todos") },
-                                        onClick = { 
-                                            selectedMonth = null 
-                                            expanded = false
-                                        }
+                            Row {
+                                // Stats Button
+                                IconButton(onClick = { navController.navigate("planStats/$planId") }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = "Ver estadísticas",
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
-                                    // Generate months list (1 to 12)
-                                    for (i in 1..12) {
-                                        val monthName = java.time.Month.of(i).name.lowercase().capitalize()
+                                }
+                                
+                                // Filter Dropdown
+                                var expanded by remember { mutableStateOf(false) }
+                                Box {
+                                    IconButton(onClick = { expanded = true }) {
+                                        Icon(Icons.Default.DateRange, contentDescription = "Filtrar por mes")
+                                    }
+                                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                                         DropdownMenuItem(
-                                            text = { Text(monthName) },
-                                            onClick = {
-                                                selectedMonth = i
+                                            text = { Text("Todos") },
+                                            onClick = { 
+                                                selectedMonth = null 
                                                 expanded = false
                                             }
                                         )
+                                        for (i in 1..12) {
+                                            val monthName = java.time.Month.of(i).name.lowercase().capitalize()
+                                            DropdownMenuItem(
+                                                text = { Text(monthName) },
+                                                onClick = {
+                                                    selectedMonth = i
+                                                    expanded = false
+                                                }
+                                            )
+                                        }
                                     }
                                 }
                             }
