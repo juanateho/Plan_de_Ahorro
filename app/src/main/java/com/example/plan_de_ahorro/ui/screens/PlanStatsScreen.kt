@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.plan_de_ahorro.di.Injection
+import com.example.plan_de_ahorro.utils.Injection
 import com.example.plan_de_ahorro.ui.viewmodel.PlanViewModel
 import com.example.plan_de_ahorro.utils.FormatUtils
 
@@ -29,8 +29,6 @@ fun PlanStatsScreen(
     viewModel: PlanViewModel = viewModel(factory = Injection.provideViewModelFactory())
 ) {
     val plan by viewModel.selectedPlan.collectAsState()
-    // We will now use the pre-calculated memberStats from the ViewModel
-    // instead of raw members and payments lists to follow MVVM separation of concerns.
     val memberStats by viewModel.memberStats.collectAsState(initial = emptyList())
 
     LaunchedEffect(planId) {
@@ -72,7 +70,6 @@ fun PlanStatsScreen(
                     }
                 }
 
-                // Table Header
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                     shape = MaterialTheme.shapes.small

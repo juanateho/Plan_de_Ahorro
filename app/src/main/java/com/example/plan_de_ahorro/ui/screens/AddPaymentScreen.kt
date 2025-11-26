@@ -11,7 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.plan_de_ahorro.di.Injection
+import com.example.plan_de_ahorro.utils.Injection
 import com.example.plan_de_ahorro.ui.viewmodel.PlanViewModel
 import com.example.plan_de_ahorro.utils.FormatUtils
 
@@ -23,7 +23,6 @@ fun AddPaymentScreen(
     viewModel: PlanViewModel = viewModel(factory = Injection.provideViewModelFactory())
 ) {
     val members by viewModel.members.collectAsState()
-    val selectedPlan by viewModel.selectedPlan.collectAsState()
     val remainingAmount by viewModel.planRemainingAmount.collectAsState(initial = 0.0)
     
     var selectedMemberId by remember { mutableStateOf("") }

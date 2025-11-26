@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.plan_de_ahorro.di.Injection
+import com.example.plan_de_ahorro.utils.Injection
 import com.example.plan_de_ahorro.ui.viewmodel.PlanViewModel
 import com.example.plan_de_ahorro.utils.FormatUtils
 import java.time.LocalDate
@@ -209,7 +209,7 @@ fun PlanDetailScreen(
                                 navController.navigate("addMember/$planId")
                             }
                         },
-                        enabled = !isPlanPaid // Deshabilitar visualmente si se prefiere, o mantener habilitado para mostrar toast
+                        enabled = !isPlanPaid
                     ) {
                         Text("Añadir Miembro")
                     }

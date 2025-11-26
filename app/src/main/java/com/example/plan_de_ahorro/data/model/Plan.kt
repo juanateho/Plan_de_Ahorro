@@ -9,7 +9,6 @@ data class Plan(
     val targetAmount: Double,
     val months: Int,
     val createdAt: String? = null,
-    // These fields are not in the new schema, but might be useful for population from other collections
     val members: List<Member>? = null,
     val payments: List<Payment>? = null,
     val totalCollected: Double? = null

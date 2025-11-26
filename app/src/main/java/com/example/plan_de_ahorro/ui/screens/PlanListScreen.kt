@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.plan_de_ahorro.di.Injection
+import com.example.plan_de_ahorro.utils.Injection
 import com.example.plan_de_ahorro.ui.viewmodel.PlanViewModel
 import com.example.plan_de_ahorro.utils.FormatUtils
 
@@ -31,8 +31,6 @@ fun PlanListScreen(
     navController: NavController,
     viewModel: PlanViewModel = viewModel(factory = Injection.provideViewModelFactory())
 ) {
-    // We now observe the pre-processed summary list from the ViewModel
-    // instead of raw plans and doing math in the UI
     val plansSummary by viewModel.plansSummary.collectAsState(initial = emptyList())
 
     LaunchedEffect(Unit) {

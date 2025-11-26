@@ -1,15 +1,17 @@
 package com.example.plan_de_ahorro.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.plan_de_ahorro.di.Injection
+import com.example.plan_de_ahorro.utils.Injection
 import com.example.plan_de_ahorro.ui.viewmodel.PlanViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -21,6 +23,7 @@ fun AddMemberScreen(
 ) {
     var name by remember { mutableStateOf("") }
     var contribution by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -43,8 +46,13 @@ fun AddMemberScreen(
             OutlinedTextField(value = contribution, onValueChange = { contribution = it }, label = { Text("Aporte Minimo Mensual") }, modifier = Modifier.fillMaxWidth())
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                viewModel.createMember(name, planId, contribution.toDouble())
-                navController.popBackStack()
+                val contributionAmount = contribution.toDoubleOrNull()
+                if (name.isNotBlank() && contributionAmount != null) {
+                    viewModel.createMember(name, planId, contributionAmount)
+                    navController.popBackStack()
+                } else {
+                    Toast.makeText(context, "Por favor, complete todos los campos correctamente.", Toast.LENGTH_SHORT).show()
+                }
             }) {
                 Text("Añadir")
             }

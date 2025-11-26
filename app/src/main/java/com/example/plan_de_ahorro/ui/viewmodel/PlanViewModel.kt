@@ -38,7 +38,6 @@ class PlanViewModel(private val repository: PlanRepository) : ViewModel() {
     private val _payments = MutableStateFlow<List<Payment>>(emptyList())
     val payments: StateFlow<List<Payment>> = _payments
 
-    // Calculated state for the selected plan's remaining amount
     val planRemainingAmount = combine(_selectedPlan, _payments) { plan, payments ->
         if (plan == null) {
             0.0
@@ -48,8 +47,7 @@ class PlanViewModel(private val repository: PlanRepository) : ViewModel() {
             if (remaining < 0) 0.0 else remaining
         }
     }
-    
-    // Calculated state for Member Stats table to keep logic out of UI
+
     val memberStats = combine(_members, _payments) { members, payments ->
         members.map { member ->
             val memberPayments = payments.filter { it.memberId == member.id }
@@ -61,11 +59,9 @@ class PlanViewModel(private val repository: PlanRepository) : ViewModel() {
         }
     }
 
-    // Map to store total payments per planId for the list view
     private val _plansProgress = MutableStateFlow<Map<String, Double>>(emptyMap())
     val plansProgress: StateFlow<Map<String, Double>> = _plansProgress
 
-    // Calculated state for Plans List to keep logic out of UI
     val plansSummary = combine(_plans, _plansProgress) { plans, progressMap ->
         plans.map { plan ->
             val totalPaid = progressMap[plan.id] ?: 0.0
@@ -140,7 +136,7 @@ class PlanViewModel(private val repository: PlanRepository) : ViewModel() {
             try {
                 val newMember = Member(name = name, planId = planId, contributionPerMonth = contributionPerMonth)
                 repository.createMember(newMember)
-                loadPlanDetails(planId) // Refresh plan details
+                loadPlanDetails(planId)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -152,8 +148,8 @@ class PlanViewModel(private val repository: PlanRepository) : ViewModel() {
             try {
                 val newPayment = Payment(amount = amount, memberId = memberId, planId = planId)
                 repository.createPayment(newPayment)
-                loadPlanDetails(planId) // Refresh plan details
-                loadPlans() // Refresh list progress as well if needed later
+                loadPlanDetails(planId)
+                loadPlans()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
