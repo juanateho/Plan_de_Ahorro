@@ -17,6 +17,13 @@ data class MemberStat(
     val paymentsCount: Int
 )
 
+data class PlanSummary(
+    val plan: Plan,
+    val totalPaid: Double,
+    val remainingAmount: Double,
+    val progressPercentage: Double
+)
+
 class PlanViewModel(private val repository: PlanRepository) : ViewModel() {
 
     private val _plans = MutableStateFlow<List<Plan>>(emptyList())
@@ -57,6 +64,25 @@ class PlanViewModel(private val repository: PlanRepository) : ViewModel() {
     // Map to store total payments per planId for the list view
     private val _plansProgress = MutableStateFlow<Map<String, Double>>(emptyMap())
     val plansProgress: StateFlow<Map<String, Double>> = _plansProgress
+
+    // Calculated state for Plans List to keep logic out of UI
+    val plansSummary = combine(_plans, _plansProgress) { plans, progressMap ->
+        plans.map { plan ->
+            val totalPaid = progressMap[plan.id] ?: 0.0
+            val remaining = if (plan.targetAmount > totalPaid) plan.targetAmount - totalPaid else 0.0
+            val percentage = if (plan.targetAmount > 0) {
+                (totalPaid * 100) / plan.targetAmount
+            } else {
+                0.0
+            }
+            PlanSummary(
+                plan = plan,
+                totalPaid = totalPaid,
+                remainingAmount = remaining,
+                progressPercentage = percentage
+            )
+        }
+    }
 
 
     fun createPlan(name: String, motive: String, targetAmount: Double, months: Int) {

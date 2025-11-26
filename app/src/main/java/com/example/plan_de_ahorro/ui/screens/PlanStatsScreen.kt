@@ -19,6 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.plan_de_ahorro.di.Injection
 import com.example.plan_de_ahorro.ui.viewmodel.PlanViewModel
+import com.example.plan_de_ahorro.utils.FormatUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,8 +29,9 @@ fun PlanStatsScreen(
     viewModel: PlanViewModel = viewModel(factory = Injection.provideViewModelFactory())
 ) {
     val plan by viewModel.selectedPlan.collectAsState()
-    val members by viewModel.members.collectAsState()
-    val payments by viewModel.payments.collectAsState()
+    // We will now use the pre-calculated memberStats from the ViewModel
+    // instead of raw members and payments lists to follow MVVM separation of concerns.
+    val memberStats by viewModel.memberStats.collectAsState(initial = emptyList())
 
     LaunchedEffect(planId) {
         viewModel.loadPlanDetails(planId)
@@ -107,11 +109,7 @@ fun PlanStatsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 LazyColumn {
-                    items(members) { member ->
-                        val memberPayments = payments.filter { it.memberId == member.id }
-                        val count = memberPayments.size
-                        val total = memberPayments.sumOf { it.amount }
-
+                    items(memberStats) { stat ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -125,18 +123,18 @@ fun PlanStatsScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    member.name,
+                                    stat.member.name,
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier.weight(2f)
                                 )
                                 Text(
-                                    count.toString(),
+                                    stat.paymentsCount.toString(),
                                     style = MaterialTheme.typography.bodyMedium,
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier.weight(1f)
                                 )
                                 Text(
-                                    "$${String.format("%.2f", total)}",
+                                    FormatUtils.formatCurrency(stat.totalPaid),
                                     style = MaterialTheme.typography.bodyMedium,
                                     textAlign = TextAlign.End,
                                     modifier = Modifier.weight(1.5f)

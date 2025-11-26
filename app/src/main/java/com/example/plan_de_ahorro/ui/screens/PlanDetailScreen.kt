@@ -1,6 +1,7 @@
 package com.example.plan_de_ahorro.ui.screens
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,11 +14,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.plan_de_ahorro.di.Injection
 import com.example.plan_de_ahorro.ui.viewmodel.PlanViewModel
+import com.example.plan_de_ahorro.utils.FormatUtils
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -34,6 +37,7 @@ fun PlanDetailScreen(
     val remainingAmount by viewModel.planRemainingAmount.collectAsState(initial = 0.0)
     
     var selectedMonth by remember { mutableStateOf<Int?>(null) } // Null means "All months"
+    val context = LocalContext.current
 
     LaunchedEffect(planId) {
         viewModel.loadPlanDetails(planId)
@@ -65,8 +69,8 @@ fun PlanDetailScreen(
                         Text(text = "Resumen Financiero", style = MaterialTheme.typography.titleMedium)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text("Motivo: ${currentPlan.motive}")
-                        Text("Meta Total: $${currentPlan.targetAmount}")
-                        Text("Faltante: $${remainingAmount}", color = MaterialTheme.colorScheme.error)
+                        Text("Meta Total: ${FormatUtils.formatCurrency(currentPlan.targetAmount)}")
+                        Text("Faltante: ${FormatUtils.formatCurrency(remainingAmount)}", color = MaterialTheme.colorScheme.error)
                         Text("Meses: ${currentPlan.months}")
                     }
                 }
@@ -100,7 +104,7 @@ fun PlanDetailScreen(
                         ) {
                             Column(modifier = Modifier.padding(12.dp)) {
                                 Text(member.name, style = MaterialTheme.typography.bodyLarge)
-                                Text("Aporte minimo mensual: $${member.contributionPerMonth}", style = MaterialTheme.typography.bodySmall)
+                                Text("Aporte mensual: ${FormatUtils.formatCurrency(member.contributionPerMonth)}", style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
@@ -176,7 +180,7 @@ fun PlanDetailScreen(
                                     Text(memberName)
                                     Text(formattedDate, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
-                                Text("$${payment.amount}", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary)
+                                Text(FormatUtils.formatCurrency(payment.amount), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary)
                             }
                         }
                     }
@@ -192,11 +196,33 @@ fun PlanDetailScreen(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
+                
+                // Validamos si el plan ya está pagado (faltante <= 0)
+                val isPlanPaid = remainingAmount <= 0.0
+                
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    Button(onClick = { navController.navigate("addMember/$planId") }) {
+                    Button(
+                        onClick = { 
+                            if (isPlanPaid) {
+                                Toast.makeText(context, "El plan ya ha alcanzado la meta. No se pueden añadir más miembros.", Toast.LENGTH_LONG).show()
+                            } else {
+                                navController.navigate("addMember/$planId")
+                            }
+                        },
+                        enabled = !isPlanPaid // Deshabilitar visualmente si se prefiere, o mantener habilitado para mostrar toast
+                    ) {
                         Text("Añadir Miembro")
                     }
-                    Button(onClick = { navController.navigate("addPayment/$planId") }) {
+                    Button(
+                        onClick = { 
+                            if (isPlanPaid) {
+                                Toast.makeText(context, "El plan ya ha alcanzado la meta. No se pueden registrar más pagos.", Toast.LENGTH_LONG).show()
+                            } else {
+                                navController.navigate("addPayment/$planId") 
+                            }
+                        },
+                        enabled = !isPlanPaid
+                    ) {
                         Text("Registrar Pago")
                     }
                 }
