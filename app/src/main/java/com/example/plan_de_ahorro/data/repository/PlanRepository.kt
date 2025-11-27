@@ -31,10 +31,6 @@ class PlanRepository(private val apiService: ApiService) {
         return apiService.createPayment(payment)
     }
 
-    suspend fun getPaymentsByMemberId(memberId: String): List<Payment> {
-        return apiService.getPaymentsByMemberId(memberId)
-    }
-
     suspend fun getPaymentsByPlanId(planId: String): List<Payment> {
         return apiService.getPaymentsByPlanId(planId)
     }

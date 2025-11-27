@@ -1,4 +1,4 @@
-package com.example.plan_de_ahorro.di
+package com.example.plan_de_ahorro.utils
 
 import androidx.lifecycle.ViewModelProvider
 import com.example.plan_de_ahorro.data.remote.RetrofitClient
